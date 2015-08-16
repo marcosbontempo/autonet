@@ -1,0 +1,51 @@
+#!/bin/bash
+
+CONFIG=config/streets
+JSON=output/signal.js
+JSON_WEB=/var/www/signal.js
+
+#Take picture
+python bin/take_picture.py
+if [ $# -gt 0 ]; then
+	line=$(cat config/vacancies | sed -n "${1}p")
+	TOP=$(echo $line | awk '{print $1}')
+	LEFT=$(echo $line | awk '{print $2}')
+	WIDTH=$(echo $line | awk '{print $3}')
+	HEIGHT=$(echo $line | awk '{print $4}')
+	RED=$(echo $line | awk '{print $5}')
+	GREEN=$(echo $line | awk '{print $6}')
+	BLUE=$(echo $line | awk '{print $7}')	
+	python bin/track.py img $TOP $LEFT $WIDTH $HEIGHT $RED $GREEN $BLUE
+else
+	# Inicio do JSON
+	echo "[ " > $JSON
+
+	while read line 
+	do
+		TOP=$(echo $line | awk '{print $1}')
+		LEFT=$(echo $line | awk '{print $2}')
+		WIDTH=$(echo $line | awk '{print $3}')
+		HEIGHT=$(echo $line | awk '{print $4}')
+		RED=$(echo $line | awk '{print $5}')
+		GREEN=$(echo $line | awk '{print $6}')
+		BLUE=$(echo $line | awk '{print $7}')	
+		python bin/track.py img $TOP $LEFT $WIDTH $HEIGHT $RED $GREEN $BLUE
+		# Se encontrou a vaga, adiciona ao JSON
+		if [ "$?" == "0" ]; then
+			LAT=$(echo $line | awk '{print $8}')
+			LNG=$(echo $line | awk '{print $9}')
+			echo "{\"lat\": $LAT, \"lng\": $LNG}," >> $JSON
+		fi
+	done < $CONFIG
+
+	# Fim do JSON
+	echo "]" >> $JSON
+	if [ $(cat $JSON | wc -l) -gt 2 ]; then
+		LAST_OBJECT=$(tail -n 2 $JSON | head -n 1)
+		NEW_LAST_OBJECT=${LAST_OBJECT::-1}
+		sed -i "s/$LAST_OBJECT/$NEW_LAST_OBJECT/" $JSON
+	fi
+	cat $JSON > $JSON_WEB
+fi
+
+exit $?

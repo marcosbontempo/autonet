@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# Instalacao do git
+sudo apt-get install -y git-all
+
+# Instalacao de pacotes
+sudo apt-get install -y ipython python-opencv python-scipy python-numpy python-pygame python-setuptools python-pip
+
+# Download e instalacao do simplecv	
+git clone https://github.com/sightmachine/SimpleCV.git
+cd SimpleCV/
+sudo pip install -r requirements.txt
+sudo python setup.py install
+
+# Teste de instalcao
+mkdir -p test_simplecv
+cd test_simplecv
+wget -nc http://www.embarcados.com.br/wp-content/uploads/2014/10/lenna.png
+
+# Orientacoes para execucao do teste
+echo && echo "Execute os comandos abaixo para testar a instalacao:"
+echo 'cd test_simplecv'
+echo "simplecv"
+echo 'SimpleCV:1>img = Image("lenna.png")'
+echo 'SimpleCV:1>img.show()'
+echo && echo
+
+exit
