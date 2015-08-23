@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Instalacao de pacotes
+sudo apt-get update
+sudo apt-get install -y python-opencv python-numpy python-scipy 
+sudo apt-get install -y cheese
+sudo apt-get install -y libopencv-*
+sudo apt-get install -y apache2 
+sudo apt-get install -y libcairo2 python-cairo-dev
+sudo apt-get install -y rtmpdump ffmpeg gstreamer0.10-ffmpeg
+
+# Configuracao do webserver
+APACHE_CONF=/etc/apache2/httpd.conf 
+sudo chown marcos:marcos /var/www/ -R
+sudo chmod 777 /var/www/ -R
+sudo echo "Header always set Access-Control-Allow-Origin \"*\"" > $APACHE_CONF
+sudo echo "Header always set Access-Control-Allow-Methods \"POST, GET, OPTIONS, DELETE, PUT\"" >> $APACHE_CONF
+sudo a2enmod headers
+sudo service apache2 restart
+
+exit $?

@@ -1,0 +1,218 @@
+#!/bin/bash
+
+# Variaveis
+OUTPUTDIR="output"
+RESULTS=${OUTPUTDIR}/results
+VEICULOS=veiculos
+JSON_WEB=output/json_web
+JSON_PAGE=/var/www/camera.js
+# Geracao do grafico
+CONT_VEICULOS=${OUTPUTDIR}/cont_veiculos
+GRAPH=$OUTPUTDIR/graph
+GRAPH_CAR=${GRAPH}/cars
+GRAPH_DATE=${GRAPH}/dates
+JSON_CAR=${GRAPH}/json_cars
+JSON_DATE=${GRAPH}/json_dates
+DOT_LINE_GRAPH=$RESULTS/graph_cars
+
+echo "*** Contagem de Carros ***"
+
+echo "Criando diretorio de saida..."
+mkdir -p ${OUTPUTDIR}
+mkdir -p ${RESULTS}
+echo 0 > $CONT_VEICULOS
+
+# LOOP INFINITO
+#while true
+#do
+	echo "[ " > $JSON_WEB
+	
+	NUM_CAM=$(ls /sys/class/video4linux/ | wc -l)
+	echo "***** Numero de cameras:" $NUM_CAM "*****"
+	CONT=1
+	
+	while [ $CONT -lt $NUM_CAM ]
+	do	
+		echo "***** Camera analizada:" $CONT "*****"
+
+		# Definicao e limpagem dos diretorios de saida
+		CAM=${OUTPUTDIR}/$CONT
+		mkdir -p ${CAM}
+		mkdir -p $CAM/$VEICULOS
+		rm ${CAM}/*
+
+		# Gravacao do video
+		echo "Gravando o video..."
+		VIDEO_FILE=${CAM}/video_$(date +"%d.%m.%y_%H.%M.%S").avi
+		RECORD_TIME=10
+		echo "python video_recorder.py $CONT ${VIDEO_FILE} ${RECORD_TIME} "
+		python video_recorder.py $CONT ${VIDEO_FILE} ${RECORD_TIME} 
+
+		# Analise do video
+		echo "Analisando o video"
+		python video.py ${VIDEO_FILE} ${CAM} ${CAM}
+
+		# Montagem do JSON para a pagina web
+
+
+		LATLNG_FILE=latlng
+		while read line
+		do
+			CAM_LATLNG=$(echo $line | cut -d ":" -f 1)
+			if [ "$CAM_LATLNG" == "$CONT" ]; then
+				echo $CONT
+				CAM_POSITION=$(echo $line | cut -d ":" -f 2)
+			fi
+		done < $LATLNG_FILE	
+
+		# Copia para a pasta de resultados
+		cp ${CAM}/5* $RESULTS/cam$CONT_$(date +"%d.%m.%y_%H.%M.%S")
+
+		# Montagem do JSON
+		echo "{\"latlng\":\"$CAM_POSITION\", \"cars\":$(cat $CONT_VEICULOS)}," >> $JSON_WEB
+
+
+		######################## Criacao do grafico ##############################
+		# Montagem dos arquivos com o numero de veiculos e datas
+		mkdir -p ${GRAPH}
+		cat ${CONT_VEICULOS} >> ${GRAPH_CAR}
+		date +"%d/%b %H:%M" >> ${GRAPH_DATE}
+		# Formacao do JSON
+		# Carros
+		echo > ${JSON_CAR}
+		while read line
+		do
+			echo $line, >> ${JSON_CAR} 
+		done < ${GRAPH_CAR}
+
+		JSON=$(cat ${JSON_CAR})
+		JSON=${JSON::-1}
+		echo [${JSON}] > ${JSON_CAR}
+
+			# Datas
+		echo > ${JSON_DATE}
+		while read line
+		do
+			echo \"$line\", >> ${JSON_DATE} 
+		done < ${GRAPH_DATE}
+
+		JSON=$(cat ${JSON_DATE})
+		JSON=${JSON::-1}
+		echo [${JSON}] > ${JSON_DATE}
+
+		#############################################################################
+
+		# Incremento da camera
+		CONT=$(($CONT+1))
+
+	done
+	
+	###################################################################################################
+	# Download e analise dos videos do stream
+
+	CONT_STREAM=1
+	STREAM_FILE=stream_cam
+	while read line
+	do
+		# Parser da posicao		
+		STREAM_LATLNG=$(echo $line | cut -d "|" -f 1)
+
+		RETURN=1
+		
+		while [ "$RETURN" == "1" ]
+		do
+			# Download do stream
+			RTMP_URL=$(echo $line | cut -d "|" -f 2)		
+			STREAMDIR=${OUTPUTDIR}/stream$CONT_STREAM/
+			VIDEO_FILE=$STREAMDIR/video_$(date +"%d.%m.%y_%H.%M.%S").avi
+			VEICULO_DIR=$VEICULOS/$(date +"%d.%m.%y_%H.%M.%S")
+			FLV=video.flv
+			mkdir -p $STREAMDIR
+			mkdir -p $STREAMDIR/$VEICULOS
+			mkdir -p $STREAMDIR/$VEICULO_DIR
+			rm $STREAMDIR/*.avi
+			rtmpdump -r $RTMP_URL -B 60 -o $FLV
+			ffmpeg -i $FLV -sameq $VIDEO_FILE
+			rm $FLV
+		
+			# Analise do video
+			echo "Analisando o video"	
+			python video.py ${VIDEO_FILE} $STREAMDIR $STREAMDIR $VEICULO_DIR
+			RETURN=$?
+			if [ "$RETURN" == "1" ]; then
+				rm -r $STREAMDIR/$VEICULO_DIR
+			fi
+			echo "Tentando obter o background de novo..."
+		done
+
+		# Copia para a pasta de resultados
+		cp ${STREAMDIR}/5* $RESULTS/stream$CONT_STREAM_$(date +"%d.%m.%y_%H.%M.%S").avi
+
+		# Salva a contagem no JSON
+ 		echo "{\"latlng\":\"$STREAM_LATLNG\", \"cars\":$(cat $CONT_VEICULOS)}," >> $JSON_WEB
+
+
+		######################## Criacao do grafico ##############################
+		# Montagem dos arquivos com o numero de veiculos e datas
+		mkdir -p ${GRAPH}
+		cat ${CONT_VEICULOS} >> ${GRAPH_CAR}
+		date +"%d/%b %H:%M" >> ${GRAPH_DATE}
+		# Formacao do JSON
+		# Carros
+		echo > ${JSON_CAR}
+		while read line
+		do
+			echo $line, >> ${JSON_CAR} 
+		done < ${GRAPH_CAR}
+
+		JSON=$(cat ${JSON_CAR})
+		JSON=${JSON::-1}
+		echo [${JSON}] > ${JSON_CAR}
+
+			# Datas
+		echo > ${JSON_DATE}
+		while read line
+		do
+			echo \"$line\", >> ${JSON_DATE} 
+		done < ${GRAPH_DATE}
+
+		JSON=$(cat ${JSON_DATE})
+		JSON=${JSON::-1}
+		echo [${JSON}] > ${JSON_DATE}
+
+		#############################################################################
+
+		# Incrementa a contagem do stream
+		CONT_STREAM=$(($CONT_STREAM+1))
+	done < $STREAM_FILE				
+
+	echo "]" >> $JSON_WEB  
+
+	# Atualiza o JSON na pagina web
+	LAST_OBJECT=$(tail -n 2 $JSON_WEB | head -n 1)
+	NEW_LAST_OBJECT=${LAST_OBJECT::-1}
+	sed -i "s/$LAST_OBJECT/$NEW_LAST_OBJECT/" $JSON_WEB
+	cat $JSON_WEB > $JSON_PAGE
+
+	###################################################################################################
+	# Geracao do script em python para criar o grafico
+	CARS=$(cat ${JSON_CAR})
+	DATES=$(cat ${JSON_DATE})
+	echo > graph.py
+	cat <<EOF > graph.py
+import CairoPlot
+CairoPlot.dot_line_plot('${DOT_LINE_GRAPH}', ${CARS}, 400, 300, h_labels = ${DATES}, axis = True, grid = True)
+EOF
+	chmod +x graph.py
+	python graph.py
+
+#done
+
+
+
+
+
+
+
+
+
