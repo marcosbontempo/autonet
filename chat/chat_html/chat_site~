@@ -1,0 +1,32 @@
+#!/bin/bash
+
+MESSAGES=messages
+JSON=output/chat.js
+JSON_WEB=/var/www/chat.js
+
+while :
+do
+	# Inicio do JSON
+	echo "[ " > $JSON
+	echo "{\"date\": \"$(date +%H:%M)\"}," >> $JSON
+
+	while read line
+	do
+		ID=$(echo $line | cut -d "-" -f 1)
+		HORA=$(echo $line | cut -d "-" -f 2)
+		MSG=$(echo $line | cut -d "-" -f 3)
+		echo "{\"id\": \"$ID\", \"hr\": \"$HORA\", \"msg\": \"$MSG\"}," >> $JSON
+	done < $MESSAGES
+
+	# Fim do JSON
+	echo "]" >> $JSON
+	if [ $(cat $JSON | wc -l) -gt 2 ]; then
+		LAST_OBJECT=$(tail -n 2 $JSON | head -n 1)
+		NEW_LAST_OBJECT=${LAST_OBJECT::-1}
+		sed -i "s/$LAST_OBJECT/$NEW_LAST_OBJECT/" $JSON
+	fi
+	cat $JSON > $JSON_WEB
+done
+
+exit $?
+

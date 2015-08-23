@@ -1,0 +1,8 @@
+#!/bin/bash
+
+sudo apt-get update
+sudo apt-get install espeak -y
+sudo apt-get install alsa-utils sox flac mpg123 -y
+sudo apt-get install python-dev python-rpi.gpio -y
+
+exit $?

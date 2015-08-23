@@ -1,0 +1,88 @@
+#!/bin/bash
+
+# Inittializing server
+kill -9 $(ps aux | grep "python bin/server" | head -n 1 | awk '{print $2}')
+bin/server &
+
+# Configure GPIO button as input
+GPIO=7
+sudo echo $GPIO > /sys/class/gpio/export
+sudo echo in > /sys/class/gpio/gpio${GPIO}/direction
+
+CARRO="output/palavra"
+CARRO_IP="127.0.0.1"
+CARRO_EXPR1="go"
+CARRO_EXPR2="ol"
+CARRO_EXPR3="bran"
+CARRO_EXPR4="co"
+CARRO_EXPR5="gol"
+CARRO_EXPR6="branco"
+BLOQUEIO1="ban"
+BLOQUEIO2="ana"
+BLOQUEIO3="banana"
+
+while :
+do
+	# Read GPIO button
+	BUTTON=$(cat /sys/class/gpio/gpio${GPIO}/value)
+	if [ "$BUTTON" == "0" ]; then
+		mpg123 sounds/informe_veiculo.mp3
+		bin/voz
+		grep -i $CARRO_EXPR1 $CARRO
+		EXPR1_RET=$?
+		grep -i $CARRO_EXPR2 $CARRO
+		EXPR2_RET=$?
+		grep -i $CARRO_EXPR3 $CARRO
+		EXPR3_RET=$?
+		grep -i $CARRO_EXPR4 $CARRO
+		EXPR4_RET=$?
+		grep -i $CARRO_EXPR5 $CARRO
+		EXPR5_RET=$?
+		grep -i $CARRO_EXPR6 $CARRO
+		EXPR6_RET=$?
+		# Car identified
+		if [ "$EXPR1_RET" == "0" ] || [ "$EXPR2_RET" == "0" ] || [ "$EXPR3_RET" == "0" ] || [ "$EXPR4_RET" == "0" ] || [ "$EXPR5_RET" == "0" ] || [ "$EXPR6_RET" == "0" ]; then
+			mpg123 sounds/veiculo_encontrado.mp3
+			secs=15 # Set interval (duration) in seconds.
+			endTime=$(( $(date +%s) + 10000 ))
+			# Wait for button pressure or timeout
+			while :
+			do
+			 	BUTTON=$(cat /sys/class/gpio/gpio${GPIO}/value)
+				echo $BUTTON
+				# Button pressure
+				if [ "$BUTTON" == "0" ]; then
+					# Get message to sent
+					mpg123 sounds/reproduza_mensagem.mp3
+					bin/voz
+					PALAVRA=$(cat output/palavra)
+					if [ "$PALAVRA" == "" ]; then
+						mpg123 sounds/mensagem_nao_enviada.mp3
+					else
+						endTime=$(( $(date +%s) + secs )) # Calculate end time.
+						grep -i $BLOQUEIO1 $CARRO
+						EXPR1_RET=$?
+						grep -i $BLOQUEIO2 $CARRO
+						EXPR2_RET=$?
+						grep -i $BLOQUEIO3 $CARRO
+						EXPR3_RET=$?
+						if [ "$EXPR1_RET" == "0" ] || [ "$EXPR2_RET" == "0" ] || [ "$EXPR3_RET" == "0" ]; then
+							mpg123 sounds/mensagem_bloqueada.mp3
+						else
+							bin/client $CARRO_IP $(cat $CARRO)
+							mpg123 sounds/mensagem_enviada.mp3
+						fi
+					fi
+					break
+				fi
+				# Timeout
+				if [ $(date +%s) -gt $endTime ] ; then			
+					mpg123 sounds/conexao_abortada.mp3
+					break
+				fi
+			done
+		else
+			mpg123 sounds/veiculo_nao_encontrado.mp3
+		fi
+	fi
+done

@@ -1,0 +1,27 @@
+#!/bin/bash
+clear
+
+#Gravacao da voz
+echo "Aguardando comando de voz"
+arecord -q -D plughw:1 -d 7 -f cd -t wav -r 16000 /dev/shm/voz.wav
+echo "Som captado"
+#Analise do volume
+volume=`sox /dev/shm/voz.wav -n stats -s 16 2>&1 | awk '/Max level/ {print $3}'`
+echo "Volume detectado: $volume"
+if [ $volume > 3.0 ]
+then
+	echo "Analisando"
+	flac /dev/shm/voz.wav -f --best --sample-rate 16000 -o /dev/shm/voz.flac 2>/dev/null
+	echo "Tentando pegar na net"
+	palavra=""
+	CONT=0
+	while [ "$palavra" == "" ] && [ $CONT -lt 1 ] 
+	do
+		palavra=`wget -O - -o /dev/null --post-file /dev/shm/voz.flac --header="Content-Type: audio/x-flac; rate=16000" "http://www.google.com/speech-api/v2/recognize?output=json&lang=pt-br&key=AIzaSyBOti4mM-6x9WDnZIjIeyEU21OpBXqWBgw" | iconv -f UTF-8 -t ISO-8859-1 | sed -e 's/[{}]/''/g' | awk -F":" '{print $4}' | awk -F"," '{print $1}' | tr -d '\n'`
+		palavra=`echo $palavra | tr -d '\"'`
+		CONT=$(($CONT+1))
+	done
+	echo $palavra
+	echo $palavra > $(pwd)/output/palavra
+fi
+
