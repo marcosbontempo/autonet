@@ -1,0 +1,89 @@
+#!/bin/sh
+
+# Json
+JSON_URL=cam.js
+JSON_FILE=cam.js
+# Streets
+OTHER_STREET='(-22.2528704, -45.70422810000002)'
+# Signal times
+GREEN_TIME=4
+YELLOW_TIME=1
+RED_CYCLES=5
+RED_SLOT=1
+# GPIO
+GREEN_GPIO=41 #IO8 
+YELLOW_GPIO=23 #IO9
+RED_GPIO=27 #IO10
+EXPORT=/sys/class/gpio/export
+
+gpio_init()
+{
+	# Export
+	echo $GREEN_GPIO > $EXPORT
+	echo $YELLOW_GPIO > $EXPORT
+	echo $RED_GPIO > $EXPORT
+	# Directions
+	echo out > /sys/class/gpio/gpio${GPIO_GREEN}/direction
+	echo out > /sys/class/gpio/gpio${YELOOW_GREEN}/direction
+	echo out > /sys/class/gpio/gpio${RED_GREEN}/direction
+}
+
+get_json()
+{
+	wget -O $JSON_FILE $JSON_URL
+}
+
+green_signal()
+{
+	echo 1 > /sys/class/gpio/gpio${GPIO_GREEN}/value
+	echo 0 > /sys/class/gpio/gpio${YELOOW_GREEN}/value
+	echo 0 > /sys/class/gpio/gpio${RED_GREEN}/value
+}
+
+yellow_signal()
+{
+	echo 0 > /sys/class/gpio/gpio${GPIO_GREEN}/value
+	echo 1 > /sys/class/gpio/gpio${YELOOW_GREEN}/value
+	echo 0 > /sys/class/gpio/gpio${RED_GREEN}/value
+}
+
+red_signal()
+{
+	echo 0 > /sys/class/gpio/gpio${GPIO_GREEN}/value
+	echo 0 > /sys/class/gpio/gpio${YELOOW_GREEN}/value
+	echo 1 > /sys/class/gpio/gpio${RED_GREEN}/value
+}
+
+#################### MAIN #########################
+
+#gpio_init
+while :
+do
+	echo "GREEN: Signal is opened."
+	#green_signal
+	sleep $GREEN_TIME
+	echo "YEELOW: Attention!"
+	#yellow_signal
+	sleep $YELLOW_TIME
+	CONT=0
+	while [ $CONT -lt $RED_CYCLES ];
+	do
+		get_json
+		OTHER_CARS=$(cat $JSON_FILE | grep "$OTHER_STREET" | cut -d ":" -f 3 | cut -d "}" -f 1)
+		echo "Therer are $OTHER_CARS cars in the other street..."
+		if [ $OTHER_CARS -eq 0 ]; then
+			echo "GREEN: Open signal due to low traffic."
+			#green_signal
+		else
+			echo "RED: Waiting."
+			#red_signal
+		fi		
+		sleep $RED_SLOT
+		CONT=$(($CONT+1))
+	done
+done
+
+exit $?
+
+
+
