@@ -1,0 +1,488 @@
+/*********************************************************************************/
+/* Main		                                                                     */
+/*********************************************************************************/
+
+	html, body
+	{
+		height: 100%;
+		background: #121314; 
+	}
+	
+	body
+	{
+		margin: 0px;
+		padding: 0px;
+		background: url('images/header.jpg');
+		background-repeat: no-repeat;
+		background-size: 90% 90%;
+		background-attachment: fixed;
+		background-position: 260px 39px; 
+		font-family: 'Source Sans Pro', sans-serif;
+		font-size: 12pt;
+		font-weight: 300;
+		color: #242424;
+	}
+	
+	h1, h2, h3
+	{
+		margin: 0;
+		padding: 0;
+	}
+	
+	p, ol, ul
+	{
+		margin-top: 0;
+	}
+	
+	ol, ul
+	{
+		padding: 0;
+		list-style: none;
+	}
+	
+	p
+	{
+		line-height: 180%;
+	}
+
+	.container
+	{
+		margin: 0px auto;
+		width: 1000px;
+	}
+
+
+/*********************************************************************************/
+/* Image Style                                                                   */
+/*********************************************************************************/
+
+	.image
+	{
+		display: inline-block;
+	}
+	
+	.image img
+	{
+		display: block;
+		width: 100%;
+	}
+	
+	.image-full
+	{
+		display: block;
+		width: 100%;
+		margin: 0 0 3em 0;
+	}
+	
+	.image-left
+	{
+		float: left;
+		margin: 0 2em 2em 0;
+	}
+	
+	.image-centered
+	{
+		display: block;
+		margin: 0 0 2em 0;
+	}
+	
+	.image-centered img
+	{
+		margin: 0 auto;
+		width: auto;
+	}
+		
+/*********************************************************************************/
+/* Heading Titles                                                                */
+/*********************************************************************************/
+
+	.title
+	{
+		margin-bottom: 3em;
+	}
+	
+	.title h2
+	{	
+		margin-left: 22px;
+		letter-spacing: 0.55em;
+		font-size: 2.4em;
+		text-align: center;
+		color: rgba(255,255,255,0.9);
+	}
+	.title h3
+	{
+		letter-spacing: 0.15em;
+		text-transform: uppercase;
+		font-weight: 400;
+		font-size: 1.1em;
+		color: #6F6F6F;
+		text-align: center;
+	}
+
+/*********************************************************************************/
+/* Header                                                                        */
+/*********************************************************************************/
+
+	#header-wrapper
+	{
+		overflow: hidden;
+	}
+
+/*********************************************************************************/
+/* Logo                                                                          */
+/*********************************************************************************/
+
+	#logo
+	{
+		text-align: center;
+	}
+
+	#logo h2
+	{
+		bottom: 0;
+		left: 0;
+		height : 10%;
+		display: inline-block;
+		border-top: 1px solid #000;
+		box-shadow:inset 0px 1px 0px 0px #4a474a;		
+		width: 100%;
+		position: absolute;
+		background: #242424;
+		font-size: 3.5em;
+	}
+	
+	#logo a
+	{
+		color: #111;
+		transition: color .3s ease;
+		text-decoration: none;
+	}
+	
+
+/*********************************************************************************/
+/* Menu                                                                          */
+/*********************************************************************************/
+
+	@import url(http://fonts.googleapis.com/css?family=Francois+One);
+	@import url(http://fonts.googleapis.com/css?family=Titillium+Web:300);
+
+	.mainmenu { -moz-user-select: none; font-size: 16px; font-family: 'Titillium Web'; background: #222; width: 684px; height: 51px; border: 0px solid #999; border-top: 1px solid #111; border-bottom: 1px solid #000; box-shadow: inset 0px 0px 1px 0px #999; text-shadow: 0 1px 0 #000; position: absolute; bottom: 458px; margin-left:297px; }
+
+	.mainmenu ul { margin: 0; padding: 0; }
+	.mainmenu li i { position: absolute; margin-left: -39px; margin-top: 8px; color: #111;  text-shadow: 0 1px 0 #666;}
+	.mainmenu li { float: left; display: block; padding: 7px 11px 0px 50px; border-right: 1px solid #121314; cursor: pointer; max-width: 120px; min-height: 44px;}
+
+	#current_page_item { background: #111; }
+	#current_page_item i {color: #666; text-shadow: 0 1px 0 #000;}
+	.mainmenu li main {font-weight: 500; margin-top: 5px; margin-left: -10px;}
+	.mainmenu li desc { position: relative; float: left; font-size: 11px; color: #888; }
+
+	.mainmenu a, .mainmenu a:hover { color: #999; text-decoration: none; }
+	
+/*********************************************************************************/
+/* Banner                                                                        */
+/*********************************************************************************/
+
+	#banner
+	{
+	}
+
+/*********************************************************************************/
+/* Wrapper                                                                       */
+/*********************************************************************************/
+
+	#wrapper1
+	{
+		background: #242424;
+		height: 24%;
+	}
+		overflow: hidden;
+		padding: 8em 0em;
+		background: #E74E59;
+	}
+
+/*********************************************************************************/
+/* Welcome                                                                       */
+/*********************************************************************************/
+
+	#welcome
+	{
+		overflow: hidden;
+		padding: 4em 0em;
+		text-align: center;
+		color: rgba(255,255,255,0.3);
+	}
+	
+	#welcome .content
+	{
+		padding: 0em 0em;
+	}
+	
+	
+	
+	#welcome a,
+	#welcome strong
+	{
+		color: rgba(255,255,255,0.6);
+	}
+
+/*********************************************************************************/
+/* TextBox                                                                       */
+/*********************************************************************************/
+
+@import url(http://fonts.googleapis.com/css?family=Titillium+Web:300);
+
+.textbox {
+    background: url('images/mail.png') no-repeat 10px 6px #FFF;
+    height: 25px;
+    width: 221px;
+    border: 1px solid #848484;
+	font-family:'Titillium Web', sans-serif;
+    padding-left: 35px;
+	font-size:14px;
+}
+
+.textbox2 {
+	color: #FFBF00;
+    background: url('images/Deep_User.png') no-repeat 10px 6px #222;
+    height: 25px;
+    width: 170px;
+    border: 0px solid #666;
+	font-family:'Ubuntu Mono', sans-serif;
+    padding-left: 35px;
+	font-size:14px;
+	border-radius:7px;
+	box-shadow: 0px 2px 0px 0px #000;
+}
+
+.textbox3 {
+	color: #FFBF00;
+    background: url('images/pass_user.png') no-repeat 10px 6px #222;
+    height: 25px;
+    width: 170px;
+    border: 0px solid #666;
+	font-family:'Ubuntu Mono', sans-serif;
+    padding-left: 35px;
+	font-size:14px;
+	border-radius:7px;
+	box-shadow: 0px 2px 0px 0px #000;
+}
+
+.textbox:focus {  
+    border-color: #4488cc; 
+    border-style: solid; 
+    border-width: 2px; 
+    outline: 0; 
+}
+
+.textbox2:focus, .textbox3:focus {  
+	text-transform: uppercase;
+    border-color: #FFBF00; 
+    border-style: solid; 
+    border-width: 1px; 
+    outline: 0; 
+}
+
+.textarea {  
+	resize: none;
+	width: 254px;
+    border-top: solid 1px #8e8e8e; 
+    border-right: solid 1px #d1d1d1; 
+    border-left: solid 1px #d1d1d1; 
+    border-bottom: solid 1px #e4e4e4;
+	font-family:'Titillium Web', sans-serif;
+	font-size:14px;
+} 
+ 
+.textarea:focus {  
+    border-color: #4488cc; 
+    border-style: solid; 
+    border-width: 2px; 
+    outline: 0; 
+} 
+
+.sendbutton {
+	box-shadow:inset 0px 1px 0px 0px #68a2d4;
+	background-color:#428bca;
+	border-radius:3px;
+	border: 1px solid #154682;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:'Oswald', sans-serif;
+	font-size:15px;
+	padding:2px 3px;
+	text-decoration:none;
+	text-shadow:0px 1px 0px #154682;
+	-moz-user-select: none;
+}
+.sendbutton:active {
+	box-shadow: 0px 0px 0px 0px #68a2d4;
+}
+
+.btn{
+  width: 203px;
+  height: 25px;
+  margin-left: 23px;
+  background:#161616;
+  border:none;
+  box-shadow: 0px 1px 0px 0px #111;
+  border-radius:3px;
+  outline:none;
+  cursor:pointer;
+  color:#FFBF00;
+  font-weight:700;
+  letter-spacing:0.125em;
+  text-align:center;
+  text-transform:uppercase;
+}
+
+.btn:active{
+  background:#FFBF00;
+  color:#333;
+}
+
+.btn2{
+  width: 259px;
+  height: 25px;
+  background:#FFBF00;
+  box-shadow: 0px 1px 0px 0px #111;
+  border:none;
+  border-radius:3px;
+  outline:none;
+  cursor:pointer;
+  color:#333;
+  font-weight:700;
+  letter-spacing:0.125em;
+  text-align:center;
+  text-transform:uppercase;
+}
+
+.btn2:active{
+  background:#161616;
+  color:#FFBF00;
+}
+
+
+/*********************************************************************************/
+/* BOXNEWUSER                                                                    */
+/*********************************************************************************/
+.opciones{
+}
+.contenido{
+  overflow: hidden;
+  background-color: rgba(0,0,0,0.7);
+  position:absolute;
+  height:200px;
+  z-index:300;
+  width:250px;
+  font-size:1em;
+  color:#828282;
+  border-radius: 10px;
+  box-shadow: 1px 1px 0 #000;
+  margin-left: 360px;
+  margin-top:-260px;
+}
+.opciones{
+  color:white;
+  position:absolute;
+  top:20px;
+  right:20px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.4);  
+  z-index:-1;
+}
+
+/*********************************************************************************/
+/* USERMENU                                                                      */
+/*********************************************************************************/
+.glossy-selectbox {
+  position: absolute;
+  z-index:400;
+  margin-top: -480px;
+  right: 0;
+  margin-right: 25px;
+  display:inline-block;
+  font:normal bold 12px Arial,Sans-Serif;
+  text-align:left;
+}
+
+.fa-gear{
+  color: #111;
+  text-shadow: 0 1px 0 #666;
+  background-color:#222;
+  cursor:pointer;
+}
+
+#gear {display:none}
+#gear:checked ~ label {
+  color: #666;
+  text-shadow: 0 1px 0 #000;
+}
+
+.glossy-selectbox ul {
+  min-width:130px;
+  max-width: 130px;
+  position:absolute;
+  right: -25px;
+  top: 21px;
+  padding:0;
+  background-color:#222;
+  border:1px solid #111;
+  visibility:hidden;
+  opacity:0;
+  z-index:99;
+}
+
+.glossy-selectbox li {
+  padding:0 0;
+  list-style:none;
+  float:left;
+  width:100%;
+  display:inline;
+}
+
+.glossy-selectbox a {
+  display:block;
+  position:relative;
+  color:#999;
+  text-decoration:none;
+  text-shadow:0 0 2px black;
+  line-height:30px;
+  border-top:1px solid #111;
+  border-right:1px solid #111;
+  padding:0 0 0 7px;
+  box-shadow:inset 0 0 0 1px #333;
+}
+
+.glossy-selectbox a:nth-child(even) {
+  border-right-width:0;
+}
+
+.glossy-selectbox a:before {
+  content:"";
+  display:block;
+  width:16px;
+  height:16px;
+  position:absolute;
+  top:7px;
+  left:7px;
+  background-color:transparent;
+  background-repeat:no-repeat;
+  background-position:50% 0;
+}
+
+.glossy-selectbox a:active:before {
+  background-position:50% 100%;
+}
+
+.glossy-selectbox a:active {
+  background-color:rgba(0,0,0,.2);
+  color:#ccc;
+}
+
+/* On click, then... */
+.glossy-selectbox input:checked ~ ul {
+  visibility:visible;
+  opacity:1;
+}

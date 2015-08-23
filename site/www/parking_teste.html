@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="icon" href="favicon.ico" type="image/ico" sizes="16x16">
+	<link href='http://fonts.googleapis.com/css?family=Oswald:400,300' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Signika:700' rel='stylesheet' type='text/css'>
+	<link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900" rel="stylesheet" />
+	<link href="http://fonts.googleapis.com/css?family=Titillium+Web:300" rel="stylesheet" />
+	<link href='http://fonts.googleapis.com/css?family=Anton' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Francois+One' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Cuprum' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="font-awesome-4.3.0/css/font-awesome.min.css">
+	<link href="css/default.css" rel="stylesheet" type="text/css" media="all" />
+	<link href="css/defaultmap.css" rel="stylesheet" type="text/css" media="all" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+		html, body, #map-canvas {
+			height: 100%;
+			margin: 0px;
+			padding: 0px
+		}
+		#map-canvas {
+			top: 53px;
+			left: 298px;
+			position: absolute;
+			z-index: 200;
+		}
+		.controls {
+			margin-left: 22px;
+			margin-top: -10px;
+			background: url('css/images/search.png') no-repeat 10px 6px #FFF;
+			height: 25px;
+			width: 221px;
+			outline: none;
+		}
+		#pac-input {
+			border: 1px solid #848484;
+			font-family:'Titillium Web', sans-serif;
+			padding-left: 35px;
+			padding-bottom: 2px;
+			text-overflow: ellipsis;
+		}
+		#pac-input:focus {
+			border-color: #4488cc; 
+			border-style: solid; 
+			border-width: 2px; 
+			outline: 0; 
+		}
+		.pac-container {
+			font-family: Roboto;
+		}
+		#type-selector {
+			color: #fff;
+			background-color: #4d90fe;
+			padding: 5px 11px 0px 11px;
+		}
+		#type-selector label {
+			font-family: Roboto;
+			font-size: 13px;
+			font-weight: 300;
+		}
+		#target {
+			width: 345px;
+		}
+    </style>
+<title>Autonet. A internet dos carros. </title>
+<script src="scripts/jquery.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=false&libraries=places"></script>
+<script>
+	
+////////////////////////////////////////////////////////////////////////////////////////
+//VARIAVEIS
+var cont=0;
+var rendererOptions = {
+  draggable: true
+};
+var directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
+var directionsService = new google.maps.DirectionsService();
+directionsRenderer = new google.maps.DirectionsRenderer(
+{
+    map: map
+});
+var map;
+var stepDisplay;
+var markerArray = [];
+var geocoder;
+var countCarros = [];
+var orderCarros = [];
+var rotaCerta;
+var srs = new google.maps.LatLng(-22.2613049,-45.7021344);
+var vr = new google.maps.LatLng(-23.2613049,-45.7021344);
+var global_location_lat;
+var global_location_lng;
+var gps_position;
+var car_position;
+var arr;
+var mapOptions = {
+	zoom: 7,
+    center: srs,
+	  panControl: false,
+	  zoomControl: false,
+	  mapTypeControl: false,
+	  scaleControl: false,
+	  streetViewControl: false,
+	  overviewMapControl: false
+};
+var mydata = [];
+var url;
+var directionsDisplay;
+var directionsService;
+var distance = 0.002;
+var out;
+var cont_vagas;
+var distancias = [];
+var menor_distancia = 10000000000;
+var menor_distancia_number;
+var posicao_distancias = 0;
+var cont_menor;
+var geocoder;
+
+/////////////////////////////////////////////////////////////////////////////////////////
+// INICIALIZACAO DO MAPA
+function initialize() {
+
+    var markers = [];
+    map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+	directionsService = new google.maps.DirectionsService();
+    var rendererOptions = {
+		map: map
+	}	
+    directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions)
+    geocoder = new google.maps.Geocoder();
+    // Create the search box and link it to the UI element.	
+    var input = /** @type {HTMLInputElement} */ (document.getElementById('pac-input'));
+    //map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+    var searchBox = new google.maps.places.SearchBox( /** @type {HTMLInputElement} */ (input));
+	
+    // [START region_getplaces]
+    // Listen for the event fired when the user selects an item from the
+    // pick list. Retrieve the matching places for that item.
+    google.maps.event.addListener(searchBox, 'places_changed', function () {
+        var places = searchBox.getPlaces();
+        cont++;
+        if (places.length == 0) {
+            return;
+        }
+        for (var i = 0, marker; marker = markers[i]; i++) {
+            marker.setMap(null);
+        }
+        // For each place, get the icon, place name, and location.
+        markers = [];
+        var bounds = new google.maps.LatLngBounds();
+        for (var i = 0, place; place = places[i]; i++) {
+            var image = {
+                url: place.icon,
+                size: new google.maps.Size(71, 71),
+                origin: new google.maps.Point(0, 0),
+                anchor: new google.maps.Point(17, 34),
+                scaledSize: new google.maps.Size(25, 25)
+            };
+            var location = place.geometry.location;
+            global_location_lat = place.geometry.location.lat();
+            global_location_lng = place.geometry.location.lng();
+		  var Area = [
+			new google.maps.LatLng(place.geometry.location.lat()-distance, place.geometry.location.lng()-distance),
+			new google.maps.LatLng(place.geometry.location.lat()+distance, place.geometry.location.lng()-distance),
+			new google.maps.LatLng(place.geometry.location.lat()+distance, place.geometry.location.lng()+distance),
+			new google.maps.LatLng(place.geometry.location.lat()-distance, place.geometry.location.lng()+distance)
+			];
+
+	  // Construct the polygon.
+	  parkingArea = new google.maps.Polygon({
+	    paths: Area,
+	    strokeColor: '#FFBF00',
+	    strokeOpacity: 0.9,
+	    strokeWeight: 2,
+	    fillColor: '#fdf518',
+	    fillOpacity: 0.55
+	  });
+	  parkingArea.setMap(map);
+	  map.setCenter(location);
+	  map.setZoom(17);
+
+	  var out = "";
+	  var n = 0;
+	  var vacancy_position;
+	  var iconBase = 'icon/GoogleMapsMarkers/';
+
+	  out += '<div style="margin-left:23px"><button class="btn2" style="margin-top:8px;" onclick="get_vacancy()">Escolha a vaga</button><br><button class="btn2" style="margin-top:8px;" onclick="get_suggestion()">Sugestão do sistema</button></div>';
+	  document.getElementById("info").innerHTML = out;
+
+	  for (var i=0; i<mydata.length; i++)
+	  {
+		// Plota marcador que esteja no raio de estacionamento
+		if ((mydata[i].lat > place.geometry.location.lat()-distance)&&(mydata[i].lat < place.geometry.location.lat()+distance)&&(mydata[i].lng > place.geometry.location.lng()-distance)&&(mydata[i].lng < place.geometry.location.lng()+distance))
+		{
+
+alert(i);
+			vacancy_position =  new google.maps.LatLng(mydata[i].lat,mydata[i].lng);
+				var marker = new google.maps.Marker({
+				    position: vacancy_position,
+				    map: map,
+					icon: iconBase+"vacancy"+n+".png",
+
+				}); 
+
+
+			  geocoder.geocode({'latLng': vacancy_position}, function(results, status) {
+			    if (status == google.maps.GeocoderStatus.OK) {
+			      if (results[1]) {
+
+				n = i + 1;
+				
+		    		out += '<div style="margin-top:8px; height: 50px; width:257px; border-radius:3px; background:#161616; color:#FFBF00; margin-left:23px"><input type="radio" name="check"' + 'id=' + n + '><label for="check" style="position:absolute;margin-left:7px;margin-top:1px">' + n + ' - ' + results[1].formatted_address + '</label><br></div>';
+
+			      } 
+			    }
+			  });
+		}
+
+	  }
+
+				  document.getElementById("info").innerHTML = out;
+
+        }
+    });
+    // [END region_getplaces]
+}
+
+function get_vacancy()
+{
+	var n;
+	for (var i=0; i<mydata.length; i++)
+	{
+		n = i + 1;
+		if (document.getElementById(String(n)).checked) {
+			url = "rota.html?" + mydata[i].lat + "&" + mydata[i].lng;
+			setTimeout(function () { window.location.href = url }, 2000);
+	    }		
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////////////
+function getRendererOptions(main_route) {
+    if (main_route) {
+        var _colour = '#00458E';
+        var _strokeWeight = 2;
+        var _strokeOpacity = 1.0;
+        var _suppressMarkers = false;
+    } else {
+        var _colour = '#ED1C24';
+        var _strokeWeight = 2;
+        var _strokeOpacity = 0.7;
+        var _suppressMarkers = false;
+    }
+    var polylineOptions = {
+        strokeColor: _colour,
+        strokeWeight: _strokeWeight,
+        strokeOpacity: _strokeOpacity
+    };
+    var rendererOptions = {
+        draggable: false,
+        suppressMarkers: _suppressMarkers,
+        polylineOptions: polylineOptions
+    };
+    return rendererOptions;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+function renderDirections(result, rendererOptions, routeToDisplay) {
+
+	switch(routeToDisplay%10)
+	{
+		case 0: var _colour = '#FFFAFA';
+				break;
+		case 1: var _colour = '#00FFFF';
+				break;
+		case 2: var _colour = '#0000FF';
+				break;			
+		case 3: var _colour = '#3CB371';
+				break;
+		case 4: var _colour = '#228B22';
+				break;
+		case 5: var _colour = '#FFFF00';
+				break;	
+		case 6: var _colour = '#FFA500';
+				break;
+		case 7: var _colour = '#FF0000';
+				break;
+		case 8: var _colour = '#EE82EE';
+				break;	
+		case 9: var _colour = '#8B8378';
+				break;					
+	}
+        
+        var _strokeWeight = 5;
+        var _strokeOpacity = 1.0;
+        //var _strokeOpacity = 0;
+        var _suppressMarkers = true;
+
+    // if (routeToDisplay == 0) _colour = "#FF0000";
+    // create new renderer object
+    var directionsRenderer = new google.maps.DirectionsRenderer({
+        draggable: false,
+        suppressMarkers: _suppressMarkers,
+        polylineOptions: {
+            strokeColor: _colour,
+            strokeWeight: _strokeWeight,
+            strokeOpacity: _strokeOpacity
+        }
+    });
+    directionsRenderer.setMap(map);
+    directionsRenderer.setDirections(result);
+    directionsRenderer.setRouteIndex(routeToDisplay);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////////////////////////
+function getDistance(myRoute) {
+    var distancia = 0;
+    var duracao = 0;
+    var distancia_total = 0;
+    var duracao_total = 0;
+	var style;
+
+    for (var i = 0; i < myRoute.routes[0].legs[0].steps.length; i++) 
+	{
+		distancia += myRoute.routes[0].legs[0].steps[i].distance.value;
+        duracao += myRoute.routes[0].legs[0].steps[i].duration.value;
+    }
+    out += '<a>' + '</a><br>';
+	out += '</div>';
+	out += '<div style="background-color: #AFcFFF">';
+    out += '<a>' + "Distância total: " + distancia /1000 + " km" + '</a><br>';
+	if (distancia < menor_distancia)
+	{
+		menor_distancia = distancia;
+		menor_distancia_number = cont_menor+1;
+	}
+	cont_menor++;
+	document.getElementById("info3").innerHTML = menor_distancia_number;
+
+	var horas = Math.floor(duracao/3600);
+	duracao = duracao - horas*3600;
+	var minutos = Math.floor(duracao/60);
+	duracao = duracao - minutos*60;
+    out += '<a>' + "Duração total: " + horas + " hrs " + minutos + " min " + duracao + " seg";  
+	out += '</div>';
+	document.getElementById("info2").innerHTML = out;
+}
+
+
+function requestDirections(start, end, routeToDisplay, main_route){
+    var request = {
+        origin: start,
+        destination: end,
+        travelMode: google.maps.DirectionsTravelMode.DRIVING,
+        provideRouteAlternatives: main_route
+    };
+
+    directionsService.route(request, function (result, status) {
+        var rotaCerta = 0
+        if (status == google.maps.DirectionsStatus.OK) {
+            if (main_route) {
+                var rendererOptions = getRendererOptions(true);
+                for (var i = 0; i < result.routes.length; i++) {
+                    renderDirections(result, rendererOptions, i);
+                }
+            } else {
+                var rendererOptions = getRendererOptions(false);
+                renderDirections(result, rendererOptions, routeToDisplay);
+                //directionsRenderer.setMap(map);
+                //directionsRenderer.setDirections(result);
+                //directionsRenderer.setRouteIndex(routeToDisplay);
+            }
+            directionsRenderer.setRouteIndex(rotaCerta);
+            //directionsDisplay.setDirections(result);
+			getDistance(result);
+		}
+    });
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+function call_route()
+{
+	var distancia_number = document.getElementById("info3").innerHTML;
+	if(distancia_number != "")
+	{
+		var vaga = parseInt(distancia_number);
+		vaga = vaga - 1;
+		var contador=0;
+		for (var i=0; i<mydata.length; i++)
+		{		
+			if ((mydata[i].lat > global_location_lat-distance)&&(mydata[i].lat < global_location_lat+distance)&&(mydata[i].lng > global_location_lng-distance)&&(mydata[i].lng < global_location_lng+distance))
+			{
+				if( contador == vaga )
+				{
+					var url = "rota.html?" + mydata[i].lat + "&" + mydata[i].lng;
+					setTimeout(function () { window.location.href = url }, 2000);
+					
+				}
+				contador++;
+			}
+		}
+		
+		
+	}
+		
+
+}
+
+function get_suggestion()
+{
+
+	var xmlhttp = new XMLHttpRequest();
+	var url = "scripts/gps.js?callback=?";
+		
+	xmlhttp.onreadystatechange = function () {
+		if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+			var pos_read = JSON.parse(xmlhttp.responseText);
+			car_position = new google.maps.LatLng(pos_read[0].lat, pos_read[0].lng);
+			
+			var iconBase = 'icon/GoogleMapsMarkers/';
+			var marker2 = new google.maps.Marker({
+				position: car_position,
+				map: map,
+				icon: iconBase + 'icon47.png'
+			});	
+			markerArray.push(marker2);
+
+			var n;
+			cont_vagas = 0;
+			cont_menor = 0;
+			out = "";
+
+			for (var i=0; i<mydata.length; i++)
+			{		
+				if ((mydata[i].lat > global_location_lat-distance)&&(mydata[i].lat < global_location_lat+distance)&&(mydata[i].lng > global_location_lng-distance)&&(mydata[i].lng < global_location_lng+distance))
+				{	
+					vacancy_position =  new google.maps.LatLng(mydata[i].lat,mydata[i].lng);				
+					requestDirections(car_position, vacancy_position, cont_vagas, true);
+					cont_vagas++;
+				}
+			}
+		}
+	}
+	xmlhttp.open("GET", url, true);
+	xmlhttp.send();
+
+
+}
+
+function load_vaga() {
+    var xmlhttp = new XMLHttpRequest();
+    var url = "scripts/vaga.js?callback=?";
+	
+    xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            mydata = JSON.parse(xmlhttp.responseText);
+        }
+    }
+    xmlhttp.open("GET", url, true);
+    xmlhttp.send();
+}
+
+
+
+//no corpo:     
+google.maps.event.addDomListener(window, 'load', initialize);
+setInterval(call_route, 1000);
+setInterval(load_vaga, 1000);
+/////////////////////////////////////////////////////////////////////////////////////////
+
+</script>
+    <style>
+      #target {
+        width: 345px;
+      }
+    </style>
+</head>
+<body>
+	<script src="scripts/jquery.min.js"></script>
+	<div style="overflow:auto; -moz-user-select: none; position: relative; background-color: #F1F1F1; display:block; align: left; max-width:30%; height:100%; border-right: 2px solid #d4d4d4; box-shadow: 1px 0px 0px 0px #000;">
+		<div style="min-height:41px; padding-top:10px; padding-left: 240px; border-bottom: 1px solid #afc6ff; border-top: 1px solid #afc6ff; box-shadow: 0 1px 0 #2965fc; background-color:#5987fb; color:#fff; text-shadow: 0 1px 0 #5678ce;"><i class="fa fa-car fa-2x"></i></div>
+		<div style="margin-top:-45px; margin-left:25px;"><font style="text-shadow: 0 1px 0 #5678ce; font-family:'Oswald'; color:#fff; font-size:25px; line-height:35px;">Encontre uma vaga</font></div>
+		<div style="margin-top:30px; margin-left:3px;"><i class="fa fa-share-square fa-lg" style="padding-left:20px; position: absolute; margin-top:3px;"></i><font style="padding: 0.50em 2.8em; font-family:'Oswald', sans-serif; font-color:#999; font-weight:500; font-size:15px;">Digite o local de escolha</font></div>
+			<input id="pac-input" class="controls" type="text" placeholder="Pesquisa" style="margin-top:6px;">
+			<br><span id="info"></span>
+	</div>
+	
+	<div id="header-wrapper">
+		<div id="header" class="container">
+			<div class="mainmenu">
+				<ul>
+					<li><a href="index.html" accesskey="1" title=""><i class="fa fa-home fa-lg"></i><main>Página Inicial</main><desc></desc></a></li>
+					<li><a href="mapa.html" accesskey="2" title=""><i class="fa fa-road fa-lg"></i><main>Tráfego Online</main><desc></desc></a></li>
+					<li id="current_page_item"><a href="parking.html" accesskey="3" title=""><i class="fa fa-car fa-lg"></i><main>Estacionamento</main><desc></desc></a></li>
+					<li><a href="chat_js.html" accesskey="4" title=""><i class="fa fa-comments fa-lg"></i><main>Chat</main><desc></desc></a></li>
+					<li><a href="social.html" accesskey="5" title=""><i class="fa fa-users fa-lg"></i><main>Social</main><desc></desc></a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+			<div class="glossy-selectbox">
+				<input type="checkbox" id="gear"/><label for="gear" class="fa fa-gear fa-2x" style="position:absolute; top:-17px; right:-3px; z-index: 2;"></label>
+				<ul>
+					<li><a href="#" target="_blank"><i class="fa fa-volume-up fa-lg" style="padding-right:5px;"></i> Voz</a></li>
+					<li><a href="#" target="_blank"><i class="fa fa-user fa-lg" style="padding-right:8px;"></i> Preferências</a></li>
+					<li><a href="#" target="_blank"><i class="fa fa-sign-out fa-lg" style="padding-right:5px;"></i> Sair</a></li>
+				</ul>
+			</div>
+	
+	<div id="map-canvas" style="float:left;width:684px; height:406px"></div>
+	<div id="logo"><h2><h3 style="position:relative; z-index:200; margin-top:-30px; letter-spacing:0.20em; font-family: 'Cuprum'; font-size: 12px; font-weight:300; text-transform:uppercase; color:#ccc; text-shadow: 0 1px 0 #000;"><i class="fa fa-copyright"></i> Copyright 2014-2015. Todos os direitos reservados | Contato - <b style="color: #FFBF00">autonet@autonet.br</b></h3></h2></div>
+</body>
+
+<script src="http://code.jquery.com/jquery-1.11.1.min.js">$('.button').on('click', function(){$(this).toggleClass('active');});</script>
+</html>

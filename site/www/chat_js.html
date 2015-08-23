@@ -1,0 +1,426 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Tráfego Online</title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+<link rel="icon" href="favicon.ico" type="image/ico" sizes="16x16">
+<link href='http://fonts.googleapis.com/css?family=Oswald:400,300' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Signika:700' rel='stylesheet' type='text/css'>
+<link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900" rel="stylesheet" />
+<link href="http://fonts.googleapis.com/css?family=Titillium+Web:300" rel="stylesheet" />
+<link href='http://fonts.googleapis.com/css?family=Anton' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Francois+One' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Cuprum' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="font-awesome-4.3.0/css/font-awesome.min.css">
+<link href="css/defaultmap.css" rel="stylesheet" type="text/css" media="all" />
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+</head>
+
+<style>
+@import url(http://fonts.googleapis.com/css?family=Lato:100,300,400,700);
+@import url(http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css);
+html, body {
+    background: #e5e5e5;
+    font-family: 'Lato', sans-serif;
+        height: 100%;
+        margin: 0px;
+        padding: 0px
+}
+::selection{
+  background: rgba(82,179,217,0.3);
+  color: inherit;
+}
+    #map-canvas {
+        top: 53px;
+        left: 298px;
+        position: absolute;
+        z-index: 200;
+    }
+    
+/* M E N U */
+
+.menuTop {
+    top: 0px;
+    margin-top: 0px;
+    left: 0px;
+    right: 0px;
+    width: 100%;
+    height: 0px;
+    background: rgba(82,179,217,0.9);
+    position: absolute;
+    z-index: 300;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.back {
+    position: absolute;
+    width: 80px;
+    height: 60px;
+    top: 0px;
+    left: 0px;
+    color: #fff;
+    line-height: 50px;
+    font-size: 30px;
+    padding-left: 10px;
+    cursor: pointer;
+}
+.back img {
+    position: absolute;
+    top: 8px;
+    left: 30px;
+    max-width:75%;
+    border-radius: 100%;
+    -webkit-border-radius: 100%;
+    -moz-border-radius: 100%;
+    -ms-border-radius: 100%;
+    margin-left: 15px;
+}
+.back a {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    top: 0;
+    left: 0;
+}
+
+.back:active {
+    background: rgba(255,255,255,0.2);
+}
+.name{
+    position: absolute;
+    top: 6px;
+    left: 100px;
+    font-family: 'Lato';
+    font-size: 25px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.98);
+    cursor: default;
+    color:#333;
+    font-weight:700;
+}
+.last{
+    position: absolute;
+    top: 27px;
+    left: 100px;
+    font-family: 'Lato';
+    font-size: 11px;
+    font-weight: 400;
+    color:#333;
+    cursor: default;
+}
+
+/* M E S S A G E S */
+
+.chat {
+    list-style: none;
+    background: none;
+    margin: 0;
+    padding: 0 0 50px 0;
+    margin-top: 60px;
+    margin-bottom: 0px;
+}
+.chat li {
+    padding: 0.5rem;
+    overflow: hidden;
+    display: flex;
+}
+.chat .avatar {
+    width: 50px;
+    height: 50px;
+    position: relative;
+    display: block;
+    z-index: 2;
+    border-radius: 100%;
+    -webkit-border-radius: 100%;
+    -moz-border-radius: 100%;
+    -ms-border-radius: 100%;
+    background-color: rgba(255,255,255,0.9);
+}
+.chat .avatar img {
+    width: 50px;
+    height: 50px;
+    border-radius: 100%;
+    -webkit-border-radius: 100%;
+    -moz-border-radius: 100%;
+    -ms-border-radius: 100%;
+    background-color: rgba(255,255,255,0.9);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+.chat .day {
+    position: relative;
+    display: block;
+    text-align: center;
+    color: #c0c0c0;
+    height: 20px;
+    text-shadow: 7px 0px 0px #e5e5e5, 6px 0px 0px #e5e5e5, 5px 0px 0px #e5e5e5, 4px 0px 0px #e5e5e5, 3px 0px 0px #e5e5e5, 2px 0px 0px #e5e5e5, 1px 0px 0px #e5e5e5, 1px 0px 0px #e5e5e5, 0px 0px 0px #e5e5e5, -1px 0px 0px #e5e5e5, -2px 0px 0px #e5e5e5, -3px 0px 0px #e5e5e5, -4px 0px 0px #e5e5e5, -5px 0px 0px #e5e5e5, -6px 0px 0px #e5e5e5, -7px 0px 0px #e5e5e5;
+    box-shadow: inset 20px 0px 0px #e5e5e5, inset -20px 0px 0px #e5e5e5, inset 0px -2px 0px #d7d7d7;
+    line-height: 38px;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    cursor: default;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.other .msg {
+    order: 1;
+    margin-left: 10px;
+    height:50px;
+    border-top-left-radius: 0px;
+    box-shadow: -1px 2px 0px #D4D4D4;
+}
+.other:before {
+    content: "";
+    position: relative;
+    top: 20px;
+    right: 0px;
+    left: 60px;
+    width: 0px;
+    height: 0px;
+    border: 8px solid #fff;
+    border-left-color: transparent;
+    border-top-color: transparent;
+    border-bottom-color: transparent;
+}
+
+.self {
+    justify-content: flex-end;
+    align-items: flex-end;
+}
+.self .msg {
+    order: 1;
+    margin-right: 10px;
+    height:50px;
+    border-bottom-right-radius: 0px;
+    box-shadow: 1px 2px 0px #D4D4D4;
+}
+.self .avatar {
+    order: 2;
+}
+.self .avatar:after {
+    content: "";
+    position: relative;
+    display: inline-block;
+    bottom: 30px;
+    right: 10px;
+    width: 0px;
+    height: 0px;
+    border: 8px solid #fff;
+    border-right-color: transparent;
+    border-top-color: transparent;
+    border-bottom-color: transparent;
+}
+
+.msg {
+    background: white;
+    min-width: 200px;
+    padding: 10px;
+    border-radius: 2px;
+    box-shadow: 0px 2px 0px rgba(0, 0, 0, 0.07);
+}
+.msg p {
+    font-size: 0.8rem;
+    margin: 0 0 0.2rem 0;
+    color: #333;
+}
+.msg img {
+    position: relative;
+    display: block;
+    width: 450px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 3px #eee;
+    transition: all .4s cubic-bezier(0.565, -0.260, 0.255, 1.410);
+    cursor: default;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.msg time {
+    font-size: 0.7rem;
+    color: #333;
+    margin-top: 3px;
+    float: right;
+    cursor: default;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+.msg time:before{
+    content:"\f017";
+    color: #333;
+    font-family: FontAwesome;
+    display: inline-block;
+    margin-right: 4px;
+}
+
+@-webikt-keyframes pulse {
+  from { opacity: 0; }
+  to { opacity: 0.5; }
+}
+
+::-webkit-scrollbar {
+    min-width: 12px;
+    width: 12px;
+    max-width: 12px;
+    min-height: 12px;
+    height: 12px;
+    max-height: 12px;
+    background: #e5e5e5;
+    box-shadow: inset 0px 50px 0px rgba(82,179,217,0.9), inset 0px -52px 0px #fafafa;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #bbb;
+    border: none;
+    border-radius: 100px;
+    border: solid 3px #e5e5e5;
+    box-shadow: inset 0px 0px 3px #999;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #b0b0b0;
+  box-shadow: inset 0px 0px 3px #888;
+}
+
+::-webkit-scrollbar-thumb:active {
+    background: #aaa;
+  box-shadow: inset 0px 0px 3px #7f7f7f;
+}
+
+::-webkit-scrollbar-button {
+    display: block;
+    height: 26px;
+}
+</style>
+
+
+
+<script src="scripts/jquery.min.js"></script>
+<script src="localhost/chat_html/scripts/chat.js"></script>
+<script>
+var out;
+
+/////////////////////////////////////////////////////////////////////////////////////////
+function load() {
+    var xmlhttp = new XMLHttpRequest();
+    var url = "http://127.0.0.1/chat_html/scripts/chat.js?callback=?";
+
+    out='';    
+    out+='<div class="menu">';
+    out+='<div class="menuTop">';         
+    out+='<div class="back"><a href="social.html"></a><div style="color:#333; margin-left: 8px; margin-top:14px;"><i class="fa fa-caret-right"></i></div> <img style="margin-top:-6px; margin-left:6px; max-width:60%;" src="css/images/person3.png" draggable="false"/\></div>';
+    out+='<div class="name">Fernando Haddad</div>';
+
+
+    xmlhttp.open("GET", url, true);
+    xmlhttp.send();
+    xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            var conversation = JSON.parse(xmlhttp.responseText);
+	    out+='<div class="last">'+conversation[0].date+'</div>';    
+        out+='</div>';        
+	    out+='<ol class="chat">'; 
+	    out+='<div class="day">Hoje</div>'; 
+
+            for (var i = 1; i < conversation.length; i++)
+	    {
+		// Mensagens enviadas
+	    	if(conversation[i].id == "rx")
+		{
+		    out+='<li class="self">'; 
+		    out+='<div class="avatar"><img src="css/images/person_me.png" draggable="false"/'+'></div>'; 
+		    out+='<div class="msg">'; 
+		    out+='<p>'+conversation[i].msg+'</p>'; 
+		    out+='<time>'+conversation[i].hr+'</time>'; 
+		    out+='</div>'; 
+		    out+='</li>'; 
+		}
+		// Mensagens recebidas
+		else
+		{
+		    out+='<li class="other">'; 
+		    out+='<div class="avatar"><img src="css/images/person3.png" draggable="false"/'+'></div>'; 
+		    out+='<div class="msg">'; 
+		    out+='<p>'+conversation[i].msg+'</p>'; 
+		    out+='<time>'+conversation[i].hr+'</time>'; 
+		    out+='</div>'; 
+		    out+='</li>'; 
+		}
+	    }			
+	    out+='</ol>'; 
+        out+='</div>'; 
+	    document.getElementById("chat").innerHTML = out;	
+        }
+    }
+}
+
+setTimeout(load, 1000);
+</script>
+<body>
+
+<div style="-moz-user-select: none; position: relative; overflow-y:auto; overflow-x:hidden; background-color: #F1F1F1; display:block; align: left; max-width:30%; height:90%; border-right: 2px solid #d4d4d4; box-shadow: 1px 0px 0px 0px #000;">
+<div style="min-height:41px; padding-top:10px; padding-left: 240px; border-bottom: 1px solid #afc6ff; border-top: 1px solid #afc6ff; box-shadow: 0 1px 0 #2965fc; background-color:#5987fb; color:#fff; text-shadow: 0 1px 0 #5678ce;"><i class="fa fa-eye fa-2x"></i></div>
+    <div style="margin-top:-45px; margin-left:25px;"><font style="text-shadow: 0 1px 0 #5678ce; font-family:'Oswald'; color:#fff; font-size:25px; line-height:35px;">Quem está por perto?</font></div>
+        <button class="btn" style="margin-top:13px;"><img src="css/images/person1.png" style="border-radius: 100%; margin-right:300px;padding:3px 3px 3px 10px;max-width:15%;"></button>
+        <div class="friends">Ricardo Buranello</div>
+        <div class="icn"><i class="fa fa-road fa-lg"></i></div><div class="distances">120m</div><div class="chaticn"><i class="fa fa-comment-o fa-2x"></i></div>
+        <button class="btn" style="margin-top:3px;"><img src="css/images/person2.png" style="border-radius: 100%; margin-right:300px;padding:3px 3px 3px 10px; max-width:15%;"></button>
+        <div class="friends">Carlos Ynoguti</div>
+        <div class="icn"><i class="fa fa-road fa-lg"></i></div><div class="distances">241m</div><div class="chaticn"><i class="fa fa-comment-o fa-2x"></i></div>
+        <button class="slc" style="margin-top:3px;"><img src="css/images/person3.png" style="border-radius: 100%; margin-right:300px;padding:3px 3px 3px 10px; max-width:15%;"></button>
+        <div class="friends">Fernando Haddad</div>
+        <div class="icn"><i class="fa fa-road fa-lg"></i></div><div class="distances">323m</div><div class="chaticn"><i class="fa fa-comment fa-2x"></i></div>
+        <button class="btn" style="margin-top:3px;"><img src="css/images/person4.png" style="border-radius: 100%; margin-right:300px;padding:3px 3px 3px 10px; max-width:15%;"></button>
+        <div class="friends">Marcos Bontempo</div>
+        <div class="icn"><i class="fa fa-road fa-lg"></i></div><div class="distances">571m</div><div class="chaticn"><i class="fa fa-comment-o fa-2x"></i></div>
+    </div>
+<div>
+<div id="header-wrapper">
+    <div id="header" class="container">
+        <div class="mainmenu">
+            <ul>
+                <li><a href="index.html" accesskey="1" title=""><i class="fa fa-home fa-lg"></i><main>Página Inicial</main><desc></desc></a></li>
+                <li><a href="mapa.html" accesskey="2" title=""><i class="fa fa-road fa-lg"></i><main>Tráfego Online</main><desc></desc></a></li>
+                <li><a href="parking.html" accesskey="3" title=""><i class="fa fa-car fa-lg"></i><main>Estacionamento</main><desc></desc></a></li>
+                <li id="current_page_item"><a href="#" accesskey="4" title=""><i class="fa fa-comments fa-lg"></i><main>Chat</main><desc></desc></a></li>
+                <li><a href="social.html" accesskey="5" title=""><i class="fa fa-users fa-lg"></i><main>Social</main><desc></desc></a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+        <div class="glossy-selectbox">
+            <input type="checkbox" id="gear"/><label for="gear" class="fa fa-gear fa-2x" style="position:absolute; top:34px; right:-3px; z-index: 2;"></label>
+            <ul>
+                <li><a href="#" target="_blank"><i class="fa fa-volume-up fa-lg" style="padding-right:5px;"></i> Voz</a></li>
+                <li><a href="#" target="_blank"><i class="fa fa-user fa-lg" style="padding-right:8px;"></i> Preferências</a></li>
+                <li><a href="#" target="_blank"><i class="fa fa-sign-out fa-lg" style="padding-right:5px;"></i> Sair</a></li>
+            </ul>
+        </div>
+</div>
+
+<div id="map-canvas" style="-moz-user-select:none; overflow-y:auto; float:left;width:684px; height:406px">
+    <div style="z-index:250; position:absolute; width:100%; height:60; top:0; background: #5987fb; box-shadow: 0px 1px 0px 0px #111;"></div>
+    <p><span id="chat"></span></p>
+</div>
+
+<div id="logo"><h2><h3 style="position:relative; z-index:200; margin-top:20px; letter-spacing:0.20em; font-family: 'Cuprum'; font-size: 12px; font-weight:300; text-transform:uppercase; color:#ccc; text-shadow: 0 1px 0 #000;"><i class="fa fa-copyright"></i> Copyright 2014-2015. Todos os direitos reservados | Contato - <b style="color: #FFBF00">autonet@autonet.br</b></h3></h2></div>
+
+<script> $( "div.map-canvas" ).scrollTop(450); </script>
+
+</body>
+</html>
